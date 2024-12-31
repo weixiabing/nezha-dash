@@ -62,7 +62,7 @@ export default function Switch({
         w: currentTagElement.offsetWidth,
       })
     }
-  }, [nowTag, allTag])
+  }, [nowTag])
 
   // 处理选中标签的自动滚动
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function Switch({
         behavior: 'smooth'
       })
     }
-  }, [nowTag, allTag])
+  }, [nowTag])
 
   return (
     <div
