@@ -21,6 +21,7 @@ export default function Switch({
   const t = useTranslations("ServerListClient")
   const [indicator, setIndicator] = useState<{ x: number; w: number }>({ x: 0, w: 0 })
 
+  // 处理初始标签加载
   useEffect(() => {
     const savedTag = sessionStorage.getItem("selectedTag")
     if (savedTag && allTag.includes(savedTag)) {
@@ -28,6 +29,7 @@ export default function Switch({
     }
   }, [allTag, onTagChange])
 
+  // 处理鼠标滚轮横向滚动
   useEffect(() => {
     const container = scrollRef.current
     if (!container) return
@@ -47,6 +49,7 @@ export default function Switch({
     }
   }, [])
 
+  // 更新指示器位置
   useEffect(() => {
     const currentTagElement = tagRefs.current[allTag.indexOf(nowTag)]?.current
     if (currentTagElement) {
@@ -57,6 +60,26 @@ export default function Switch({
             ? currentTagElement.offsetLeft - parentPadding
             : currentTagElement.offsetLeft,
         w: currentTagElement.offsetWidth,
+      })
+    }
+  }, [nowTag, allTag])
+
+  // 处理选中标签的自动滚动
+  useEffect(() => {
+    const currentTagElement = tagRefs.current[allTag.indexOf(nowTag)]?.current
+    const container = scrollRef.current
+    
+    if (currentTagElement && container) {
+      const containerRect = container.getBoundingClientRect()
+      const tagRect = currentTagElement.getBoundingClientRect()
+      
+      // 计算需要滚动的位置，使选中的标签居中显示
+      const scrollLeft = currentTagElement.offsetLeft - (containerRect.width - tagRect.width) / 2
+      
+      // 使用平滑滚动效果
+      container.scrollTo({
+        left: Math.max(0, scrollLeft), // 确保不会出现负值
+        behavior: 'smooth'
       })
     }
   }, [nowTag, allTag])
@@ -82,7 +105,10 @@ export default function Switch({
           <div
             key={tag}
             ref={tagRefs.current[index]}
-            onClick={() => onTagChange(tag)}
+            onClick={() => {
+              onTagChange(tag)
+              sessionStorage.setItem("selectedTag", tag)
+            }}
             className={cn(
               "relative cursor-pointer rounded-3xl px-2.5 py-[8px] text-[13px] font-[600]",
               "transition-all duration-500 ease-in-out text-stone-400 dark:text-stone-500",
